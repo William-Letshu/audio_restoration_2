@@ -1,20 +1,42 @@
 package com.example.audio_2;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Random;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import static com.example.audio_2.WaveForm.drawWaveform;
 
 public class HelloController {
+    
+    @FXML
+    private RadioButton radio_noise;
+    @FXML
+    private RadioButton radio_equalize;
+    @FXML
+    private RadioButton radio_loud;
+    @FXML
+    private RadioButton radio_clip;
+    private boolean noise;
+    private boolean equalize;
+    private boolean loud;
+    private boolean de_clip;
+    
+    @FXML
+    private Text clipping_text;
+    @FXML
+    private Text Clipping;
     File selected;
     @FXML
     private ImageView mel_after;
@@ -30,10 +52,33 @@ public class HelloController {
     private ImageView wave_before;
 
     @FXML
-    private void perform_analysis() {
+    private void perform_all(){
+        System.out.println("All procedures selected");
+    }
+
+    @FXML
+    private void selective(){
+        System.out.println("Some selected");
+    }
+
+    @FXML
+    private void perform_analysis() throws IOException, InterruptedException {
         setMel_before();
         setWave_before();
         setSpectrum_before();
+        audio_clipping();
+    }
+
+    public void audio_clipping() throws IOException, InterruptedException{
+        if(selected != null){
+            boolean clipping= DetectClipping.hasClipping(selected.getPath());
+            
+            if(clipping){
+                update_text_clipping("Audio contains clipping");    
+            }else{
+                update_text_clipping("Audio doesn't have clipping");
+            }
+        }
     }
 
     public void setSpectrum_before() {
@@ -41,7 +86,8 @@ public class HelloController {
             String imagePath = "src/main/resources/com/example/audio_2/Images/before_spectrum.png";
             Path currentPath = Paths.get("").toAbsolutePath();
             String scriptPath = currentPath.resolve("src").resolve("main").resolve("java").resolve("com").
-                    resolve("example").resolve("audio_2").resolve("draw_spectrum.py").toString();
+                    resolve("example").resolve("audio_2").resolve("python").
+                    resolve("draw_spectrum.py").toString();
 
             RunPythonScript.runPythonScript(scriptPath,selected.getPath(),"before_spectrum.png");
             this.spectrum_before.setImage(setImageViewFromPath(imagePath));
@@ -56,7 +102,7 @@ public class HelloController {
             String imagePath = "src/main/resources/com/example/audio_2/Images/before_waveform.png";
             Path currentPath = Paths.get("").toAbsolutePath();
             String scriptPath = currentPath.resolve("src").resolve("main").resolve("java").resolve("com").
-            resolve("example").resolve("audio_2").resolve("draw_waveform.py").toString();
+            resolve("example").resolve("audio_2").resolve("python").resolve("draw_waveform.py").toString();
 
             RunPythonScript.runPythonScript(scriptPath,selected.getPath(),"before_waveform.png");
             this.wave_before.setImage(setImageViewFromPath(imagePath));
@@ -66,13 +112,12 @@ public class HelloController {
     }
 
 
-
     @FXML
     protected void setMel_before() {
         if (selected != null){
             Path currentPath = Paths.get("").toAbsolutePath();
             String scriptPath = currentPath.resolve("src").resolve("main").resolve("java").resolve("com").
-            resolve("example").resolve("audio_2").resolve("script.py").toString();
+            resolve("example").resolve("audio_2").resolve("python").resolve("script.py").toString();
 
             RunPythonScript.runPythonScript(scriptPath,selected.getPath(),"before_mel_spectrogram.png");
             
@@ -84,19 +129,10 @@ public class HelloController {
     }
 
     public static Image setImageViewFromPath(String imagePath) {
-        // Create a File object from the image path.
         File imageFile = new File(imagePath);
-        
-        // Create a proper URL from the File object.
         String imageURL = imageFile.toURI().toString();
-        
-        // Create an Image object from the image URL.
         Image image = new Image(imageURL);
-        
-        // Create an ImageView object.
         ImageView imageView = new ImageView();
-        
-        // Set the image to the ImageView object.
         imageView.setImage(image);
         
         return image;
@@ -121,7 +157,11 @@ public class HelloController {
     @FXML
     private void handleImageViewClick(MouseEvent event) {
         ImageView imageView = (ImageView) event.getSource();
-        enlargeImage(imageView.getImage());
+        if (imageView != null) {
+            enlargeImage(imageView.getImage());
+            System.out.println("Image is not null"); 
+        }
+        
     }
 
     private void enlargeImage(Image image) {
@@ -139,5 +179,15 @@ public class HelloController {
         Scene scene = new Scene(scrollPane, 800, 600); // Set the desired dimensions for the new window
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void update_text_clipping(String text) {        
+        Random random = new Random();
+        float hue = random.nextFloat() * 360;
+        float saturation = 0.9f; // Keep saturation high for bright colors
+        float brightness = 0.5f + random.nextFloat() * 0.5f; // Keep brightness between 0.5 and 1.0 for bright colors without black
+        Color randomColor = Color.hsb(hue, saturation, brightness);
+        clipping_text.setFill(randomColor);
+        clipping_text.setText(text);
     }
 }
