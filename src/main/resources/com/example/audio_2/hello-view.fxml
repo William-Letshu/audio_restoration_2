@@ -51,15 +51,16 @@
       <Text fx:id="Clipping" layoutX="231.0" layoutY="122.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
       <TextArea layoutX="12.0" layoutY="629.0" prefHeight="176.0" prefWidth="461.0" text="Based on the graph above and whether there's clipping. You as the user can &#10;decide to only apply certain procedures on the audio file. Hence just select &#10;on the right hand-side or you can just clip on the recommended button&#10;which will perform all the procedures.&#10;&#10;" />
       <Button layoutX="492.0" layoutY="642.0" mnemonicParsing="false" onAction="#selective" prefHeight="26.0" prefWidth="102.0" text="Enhance audio" />
-      <RadioButton fx:id="radio_noise" layoutX="492.0" layoutY="691.0" mnemonicParsing="false" text="Noise Reduction" textFill="#e1dddd" />
-      <RadioButton fx:id="radio_equalize" layoutX="640.0" layoutY="691.0" mnemonicParsing="false" text="Equalization" textFill="#dddbdb" />
-      <RadioButton fx:id="radio_loud" layoutX="492.0" layoutY="733.0" mnemonicParsing="false" text="Loudness Normilzation" textFill="#bfb8b8" />
-      <RadioButton fx:id="radio_clip" layoutX="649.0" layoutY="733.0" mnemonicParsing="false" text="De-clipping" textFill="#ddd5d5" />
+      <RadioButton fx:id="radio_noise" layoutX="492.0" layoutY="691.0" mnemonicParsing="false" onAction="#update_noise" text="Noise Reduction" textFill="#e1dddd" />
+      <RadioButton fx:id="radio_equalize" layoutX="640.0" layoutY="691.0" mnemonicParsing="false" onAction="#update_equalize" text="Equalization" textFill="#dddbdb" />
+      <RadioButton fx:id="radio_loud" layoutX="492.0" layoutY="733.0" mnemonicParsing="false" onAction="#update_loud" text="Loudness Normilzation" textFill="#bfb8b8" />
+      <RadioButton fx:id="radio_clip" layoutX="649.0" layoutY="733.0" mnemonicParsing="false" onAction="#update_de_clipping" text="De-clipping" textFill="#ddd5d5" />
       <Text fx:id="clipping_text" fill="#fff3f3" layoutX="203.0" layoutY="116.0" strokeType="OUTSIDE" strokeWidth="0.0" text="If audio contains clipping it will reflect here">
          <font>
             <Font size="19.0" />
          </font>
       </Text>
       <Button layoutX="736.0" layoutY="643.0" mnemonicParsing="false" onAction="#perform_all" prefHeight="26.0" prefWidth="105.0" text="Recommended" />
+      <Text fx:id="selected_step" fill="#f5f2f2" layoutX="762.0" layoutY="691.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Selected Options:" wrappingWidth="101.83544921875003" />
    </children>
 </AnchorPane>

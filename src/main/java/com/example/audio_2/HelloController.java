@@ -20,6 +20,11 @@ import javafx.stage.Stage;
 
 public class HelloController {
     
+    private boolean noise = false;
+    private boolean equalize = false;
+    private boolean loud = false;
+    private boolean de_clip = false;
+    
     @FXML
     private RadioButton radio_noise;
     @FXML
@@ -28,10 +33,7 @@ public class HelloController {
     private RadioButton radio_loud;
     @FXML
     private RadioButton radio_clip;
-    private boolean noise;
-    private boolean equalize;
-    private boolean loud;
-    private boolean de_clip;
+
     
     @FXML
     private Text clipping_text;
@@ -50,6 +52,65 @@ public class HelloController {
     private ImageView wave_after;
     @FXML
     private ImageView wave_before;
+
+    @FXML
+    private Text selected_step;
+
+    @FXML
+    private void update_noise(){
+        if( this.noise){
+            this.noise = false;
+            String temp =selected_step.getText();
+            temp = temp.replace("\nNoise Reduction","");
+            selected_step.setText(temp);
+        }else{
+            this.noise = true;
+            String temp =selected_step.getText();
+            selected_step.setText(temp+"\nNoise Reduction");
+        }
+    }
+
+    @FXML
+    private void update_equalize(){
+        if (this.equalize){
+            this.equalize = false;
+            String temp =selected_step.getText();
+            temp = temp.replace("\nEqualization","");
+            selected_step.setText(temp);
+        }else{
+            this.equalize = true;
+            String temp =selected_step.getText();
+            selected_step.setText(temp+"\nEqualization");
+        }
+    }
+
+    @FXML
+    private void update_de_clipping(){
+        if (this.de_clip){
+            this.de_clip = false;
+            String temp =selected_step.getText();
+            temp = temp.replace("\nDe_clip","");
+            selected_step.setText(temp);
+        }else{
+            this.de_clip = true;
+            String temp =selected_step.getText();
+            selected_step.setText(temp+"\nDe_clip");
+        }
+    }
+
+    @FXML
+    private void update_loud(){
+        if (this.loud){
+            this.loud = false;
+            String temp =selected_step.getText();
+            temp = temp.replace("\nLoud","");
+            selected_step.setText(temp);
+        }else{
+            this.loud = true;
+            String temp =selected_step.getText();
+            selected_step.setText(temp+"\nLoud");
+        }
+    }
 
     @FXML
     private void perform_all(){
