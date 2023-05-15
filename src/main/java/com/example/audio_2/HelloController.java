@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -24,6 +26,9 @@ public class HelloController {
     private boolean equalize = false;
     private boolean loud = false;
     private boolean de_clip = false;
+    File nextFile = null;
+    File selected;
+    File temp;
     
     @FXML
     private RadioButton radio_noise;
@@ -39,7 +44,6 @@ public class HelloController {
     private Text clipping_text;
     @FXML
     private Text Clipping;
-    File selected;
     @FXML
     private ImageView mel_after;
     @FXML
@@ -60,12 +64,12 @@ public class HelloController {
     private void update_noise(){
         if( this.noise){
             this.noise = false;
-            String temp =selected_step.getText();
+            String temp =this.selected_step.getText();
             temp = temp.replace("\nNoise Reduction","");
             selected_step.setText(temp);
         }else{
             this.noise = true;
-            String temp =selected_step.getText();
+            String temp =this.selected_step.getText();
             selected_step.setText(temp+"\nNoise Reduction");
         }
     }
@@ -74,7 +78,7 @@ public class HelloController {
     private void update_equalize(){
         if (this.equalize){
             this.equalize = false;
-            String temp =selected_step.getText();
+            String temp =this.selected_step.getText();
             temp = temp.replace("\nEqualization","");
             selected_step.setText(temp);
         }else{
@@ -84,6 +88,7 @@ public class HelloController {
         }
     }
 
+    
     @FXML
     private void update_de_clipping(){
         if (this.de_clip){
@@ -115,19 +120,78 @@ public class HelloController {
     @FXML
     private void perform_all(){
         System.out.println("All procedures selected");
+        if(this.selected != null){
+            System.out.println("File is not null!!");
+        }else{
+            utils.pop_msg();
+        }
     }
 
     @FXML
     private void selective(){
         System.out.println("Some selected");
+    
+        if(this.selected_step != null && this.selected_step.getText() != null){
+            String[] temp_options = this.selected_step.getText().split("\n");
+    
+            System.out.println(this.selected_step.getText());
+    
+            if(this.selected != null){
+                Map<String, String> scriptMap = new HashMap<>();
+                scriptMap.put("De_clip", "de_clip.py");
+                scriptMap.put("Loud", "loudness_normalization.py");
+                scriptMap.put("Noise Reduction", "noise_reduction.py");
+                scriptMap.put("Equalization", "equalize_audio.py");
+    
+                for (int i = 0; i < temp_options.length; i++) {
+                    for(Map.Entry<String, String> entry : scriptMap.entrySet()) {
+                        if(temp_options[i] != null && temp_options[i].contains(entry.getKey())){
+                            String audio_path = String.format("src/main/resources/com/example/audio_2/Audio/%s.wav", entry.getKey().toLowerCase());
+                            Path currentPath = Paths.get("").toAbsolutePath();
+                            String scriptPath = currentPath.resolve("src").resolve("main").resolve("java").resolve("com").
+                                    resolve("example").resolve("audio_2").resolve("python").
+                                    resolve(entry.getValue()).toString();
+    
+                            if(nextFile == null){
+                                RunPythonScript.runPythonScript(scriptPath,selected.getPath(),audio_path);
+                            }else{
+                                RunPythonScript.runPythonScript(scriptPath,nextFile.getPath(),audio_path);
+                            }
+    
+                            nextFile = new File(audio_path);
+                        }
+                    }
+                }
+            } else {
+                utils.pop_msg();
+            }
+        } else {
+            System.out.println("selected_step or selected_step.getText() is null");
+        }
+
+        temp = selected;
+        selected = nextFile;
+
+        setMel_after();
+        setWave_after();
+        setSpectrum_after();
+        nextFile = null; //resetting the process
+        selected = temp;
     }
+    
 
     @FXML
     private void perform_analysis() throws IOException, InterruptedException {
-        setMel_before();
-        setWave_before();
-        setSpectrum_before();
-        audio_clipping();
+        
+        if(this.selected != null){
+            setMel_before();
+            setWave_before();
+            setSpectrum_before();
+            audio_clipping();   
+        }else{
+            utils.pop_msg();
+        }
+        
     }
 
     public void audio_clipping() throws IOException, InterruptedException{
@@ -142,6 +206,23 @@ public class HelloController {
         }
     }
 
+    public void setSpectrum_after(){
+
+        if (selected != null){
+            String imagePath = "src/main/resources/com/example/audio_2/Images/after_spectrum.png";
+            Path currentPath = Paths.get("").toAbsolutePath();
+            String scriptPath = currentPath.resolve("src").resolve("main").resolve("java").resolve("com").
+                    resolve("example").resolve("audio_2").resolve("python").
+                    resolve("draw_spectrum.py").toString();
+
+            RunPythonScript.runPythonScript(scriptPath,selected.getPath(),"after_spectrum.png");
+            this.spectrum_after.setImage(setImageViewFromPath(imagePath));
+        }else{
+            utils.pop_msg();
+        }
+        
+    }
+
     public void setSpectrum_before() {
         if (selected != null){
             String imagePath = "src/main/resources/com/example/audio_2/Images/before_spectrum.png";
@@ -152,6 +233,21 @@ public class HelloController {
 
             RunPythonScript.runPythonScript(scriptPath,selected.getPath(),"before_spectrum.png");
             this.spectrum_before.setImage(setImageViewFromPath(imagePath));
+        }else{
+            utils.pop_msg();
+        }
+    }
+
+
+    public void setWave_after() {
+        if (selected != null){
+            String imagePath = "src/main/resources/com/example/audio_2/Images/after_waveform.png";
+            Path currentPath = Paths.get("").toAbsolutePath();
+            String scriptPath = currentPath.resolve("src").resolve("main").resolve("java").resolve("com").
+            resolve("example").resolve("audio_2").resolve("python").resolve("draw_waveform.py").toString();
+
+            RunPythonScript.runPythonScript(scriptPath,selected.getPath(),"after_waveform.png");
+            this.wave_after.setImage(setImageViewFromPath(imagePath));
         }else{
             System.out.println("File hasn't been selected");
         }
@@ -167,6 +263,21 @@ public class HelloController {
 
             RunPythonScript.runPythonScript(scriptPath,selected.getPath(),"before_waveform.png");
             this.wave_before.setImage(setImageViewFromPath(imagePath));
+        }else{
+            System.out.println("File hasn't been selected");
+        }
+    }
+
+    protected void setMel_after() {
+        if (selected != null){
+            Path currentPath = Paths.get("").toAbsolutePath();
+            String scriptPath = currentPath.resolve("src").resolve("main").resolve("java").resolve("com").
+            resolve("example").resolve("audio_2").resolve("python").resolve("script.py").toString();
+
+            RunPythonScript.runPythonScript(scriptPath,selected.getPath(),"after_mel_spectrogram.png");
+            
+            String imagePath = "src/main/resources/com/example/audio_2/Images/after_mel_spectrogram.png";
+            this.mel_after.setImage(setImageViewFromPath(imagePath));
         }else{
             System.out.println("File hasn't been selected");
         }

@@ -1,19 +1,28 @@
-import os
 import sys
-from pydub import AudioSegment
-from pydub.effects import equalize
+import numpy as np
+import librosa
+import scipy.signal as signal
+import soundfile as sf
 
-def equalize_audio(audio_file_path, bands=None):
-    if bands is None:
-        bands = [(50, 100), (100, 200), (200, 400), (400, 800), (800, 1600), (1600, 3200), (3200, 6400), (6400, 12800), (12800, 16000)]
+def parametric_eq(audio_file_path, output_audio_file_path, center_freq, Q, gain):
+    y, sr = librosa.load(audio_file_path, sr=None)
 
-    audio = AudioSegment.from_file(audio_file_path)
-    equalized_audio = equalize(audio, bands)
-    return equalized_audio
+    # Design peaking equalization filter
+    b, a = signal.iirpeak(center_freq/(sr/2), Q, gain)
+
+    # Apply the filter to the audio signal
+    y_filtered = signal.lfilter(b, a, y)
+
+    # Save the filtered audio
+    sf.write(output_audio_file_path, y_filtered, sr)
 
 if __name__ == '__main__':
     input_audio_file_path = sys.argv[1]
     output_audio_file_path = sys.argv[2]
-    output_audio_file_path = os.path.join('src', 'main', 'resources','com','example','audio_2','Audio', output_audio_file_path)
-    equalized_audio = equalize_audio(input_audio_file_path)
-    equalized_audio.export(output_audio_file_path, format="wav")
+
+    # Parameters for the equalizer
+    center_freq = 1000.0  # Center frequency in Hz
+    Q = 1.0  # Quality factor
+    gain = 1.0  # Gain at the center frequency in dB
+
+    parametric_eq(input_audio_file_path, output_audio_file_path, center_freq, Q, gain)
