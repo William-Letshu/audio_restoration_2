@@ -2,6 +2,10 @@
 
 This is a JavaFX application that handles audio processing tasks.
 
+## User Interface
+
+The user interface of the application is designed using JavaFX and it provides a straightforward and user-friendly way to interact with the application. The design includes buttons for file selection, performing audio analysis and enhancement, and radio buttons for selecting specific audio processing options. Visualizations of the audio data (both pre and post-processing) are displayed for the user's convenience.
+
 # Installation Instructions
 
 This project requires Maven, Java, and Python with certain packages. Here's how you can set up everything:
@@ -89,17 +93,6 @@ If the Python packages required by your project are listed in a `requirements.tx
 pip install -r requirements.txt
 ```
 
-If you don't have a `requirements.txt` file, you can install Python packages individually with:
-
-```bash
-pip install package-name
-```
-
-Replace `package-name` with the name of the package.
-
-After setting up, you can now run your application as described in the project's README.
-
-
 ## Features
 
 This application leverages several libraries to provide its functionality and offers the following features:
@@ -125,17 +118,3 @@ mvn clean javafx:run
 ```
 
 This command will launch the `HelloApplication` from the `com.example.audio_2` package.
-
-## Contributing
-
-Feel free to submit issues and enhancement requests.
-
-## License
-
-Please see the `LICENSE` file for more information.
-
-## User Interface
-
-The user interface of the application is designed using JavaFX and it provides a straightforward and user-friendly way to interact with the application. The design includes buttons for file selection, performing audio analysis and enhancement, and radio buttons for selecting specific audio processing options. Visualizations of the audio data (both pre and post-processing) are displayed for the user's convenience.
-
-Please note that this application is under active development and features may be added or changed over time.
