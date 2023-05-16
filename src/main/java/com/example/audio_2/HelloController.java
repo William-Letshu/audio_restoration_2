@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 import javafx.fxml.FXML;
@@ -121,7 +122,36 @@ public class HelloController {
     private void perform_all(){
         System.out.println("All procedures selected");
         if(this.selected != null){
-            System.out.println("File is not null!!");
+            
+            Map<String, String> scriptMap = new LinkedHashMap<>();
+            scriptMap.put("Noise_Reduction_generated", "noise_reduction.py");
+            scriptMap.put("De_clip_generated", "de_clip.py");
+            scriptMap.put("Equalization_generated", "equalize_audio.py");
+            scriptMap.put("Loud_generated", "loudness_normalization.py");
+        
+            for (Map.Entry<String, String> entry : scriptMap.entrySet()) {
+                String audio_path = String.format("src/main/resources/com/example/audio_2/Audio/%s.wav", entry.getKey().toLowerCase());
+                Path currentPath = Paths.get("").toAbsolutePath();
+                String scriptPath = currentPath.resolve("src").resolve("main").resolve("java").resolve("com").
+                        resolve("example").resolve("audio_2").resolve("python").
+                        resolve(entry.getValue()).toString();
+        
+                if(nextFile == null){
+                    RunPythonScript.runPythonScript(scriptPath,selected.getPath(),audio_path);
+                }else{
+                    RunPythonScript.runPythonScript(scriptPath,nextFile.getPath(),audio_path);
+                }
+        
+                nextFile = new File(audio_path);
+            }
+
+            temp = this.selected;
+            this.selected = nextFile;
+            setMel_after();
+            setSpectrum_after();
+            setSpectrum_after();
+            this.selected = temp;
+            nextFile = null;
         }else{
             utils.pop_msg();
         }
